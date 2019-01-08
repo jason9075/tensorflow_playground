@@ -1,3 +1,6 @@
+# dataset: https://github.com/zalandoresearch/fashion-mnist
+# https://blog.keras.io/keras-as-a-simplified-interface-to-tensorflow-tutorial.html
+
 import keras
 import tensorflow as tf
 from keras import backend as K

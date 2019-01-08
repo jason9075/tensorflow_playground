@@ -1,4 +1,5 @@
 # dataset: https://github.com/zalandoresearch/fashion-mnist
+# https://medium.com/@pipidog/how-to-convert-your-keras-models-to-tensorflow-e471400b886a
 
 import keras
 import tensorflow as tf
