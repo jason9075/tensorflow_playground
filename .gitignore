@@ -40,6 +40,9 @@ tmtagsHistory
 *.sublime-workspace
 .bundle
 
+# jupyter notebook
+.ipynb_checkpoints
+
 # dataset
 data/*
 !data/pascal_voc_images
