@@ -42,6 +42,7 @@ tmtagsHistory
 
 # dataset
 data/*
+!data/pascal_voc_images
 !data/.keep
 
 # models
