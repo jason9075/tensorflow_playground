@@ -51,3 +51,7 @@ data/*
 # models
 output_models/*
 !output_models/.keep
+
+# tensor_board records
+tensor_board/*
+!tensor_board/.keep
