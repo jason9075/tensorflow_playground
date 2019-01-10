@@ -7,7 +7,7 @@ from utils.mnist_reader import load_mnist
 
 LESS_DATA = True
 BATCH_SIZE = 100
-EPOCHS = 1
+EPOCHS = 2
 LR = 1
 
 
@@ -23,8 +23,8 @@ def main():
     x_test, y_test = shuffle(x_test, y_test)
 
     if LESS_DATA:
-        x_train, y_train = x_train[0:1000, ], y_train[0:1000, ]
-        x_test, y_test = x_train[0:1000, ], y_train[0:1000, ]
+        x_train, y_train = x_train[0:10000, ], y_train[0:10000, ]
+        x_test, y_test = x_train[0:10000, ], y_train[0:10000, ]
 
     num_classes = len(set(y_train))
     n = x_train.shape[0]
@@ -39,7 +39,7 @@ def main():
         x = tf.layers.conv2d(x, filters=64, kernel_size=[3, 3], padding='same', activation=tf.nn.relu, name='conv_2')
         x = tf.layers.max_pooling2d(x, pool_size=[2, 2], strides=2, padding='same', name='pool')
         x = tf.layers.flatten(x)
-        x = tf.layers.dense(x, units=1024, activation=tf.nn.relu, name='dense')
+        x = tf.layers.dense(x, units=128, activation=tf.nn.relu, name='dense')
     output = tf.layers.dense(x, units=num_classes, name='output_dense')
     print(output.name)
     labels = tf.placeholder(tf.int32, shape=(None, 1), name='labels')  # 用tensorflow
@@ -75,17 +75,15 @@ def main():
         print("train complete! test cost: {:.3f}, acc: {:.3f}".format(test_cost, test_acc))
 
         # save model to pb file
-        # tf.train.write_graph(sess.graph, "output_models/", "tf_fashion.pb", as_text=False)
-        # tf.train.write_graph(sess.graph, "output_models/", "tf_fashion.pbtxt", as_text=True)
+        tf.train.write_graph(sess.graph, "output_models/", "tf_fashion.pb", as_text=False)
+        tf.train.write_graph(sess.graph, "output_models/", "tf_fashion.pbtxt", as_text=True)
 
         # frozen graph
-        output_names = ['output_dense/BiasAdd']
-        frozen_graph = utils.freeze_session(sess, output_names=output_names)
+        frozen_graph = utils.freeze_session(sess)
         tf.train.write_graph(frozen_graph, "output_models/", "tf_frozen_fashion.pb", as_text=False)
         tf.train.write_graph(frozen_graph, "output_models/", "tf_frozen_fashion.pbtxt", as_text=True)
 
     # build keras model
-
 
 
 if __name__ == '__main__':
