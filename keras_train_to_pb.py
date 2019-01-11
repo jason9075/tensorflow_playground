@@ -5,6 +5,7 @@ import keras
 import tensorflow as tf
 from keras.layers import Conv2D, MaxPooling2D, Input, Dense, Dropout, Flatten
 from keras.models import Model
+from sklearn.utils import shuffle
 
 from utils import utils
 from utils.mnist_reader import load_mnist
@@ -17,10 +18,12 @@ EPOCHS = 2
 def main():
     x_train, y_train = load_mnist('data/fashion', kind='train')
     x_test, y_test = load_mnist('data/fashion', kind='t10k')
+    x_train, y_train = shuffle(x_train, y_train)
+    x_test, y_test = shuffle(x_test, y_test)
 
     if LESS_DATA:
         x_train, y_train = x_train[0:10000, ], y_train[0:10000, ]
-        x_test, y_test = x_train[0:1000, ], y_train[0:1000, ]
+        x_test, y_test = x_test[0:1000, ], y_train[0:1000, ]
 
     num_classes = len(set(y_train))
 
