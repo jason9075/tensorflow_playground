@@ -26,7 +26,7 @@ def main():
 
     if LESS_DATA:
         x_train, y_train = x_train[0:10000, ], y_train[0:10000, ]
-        x_test, y_test = x_test[0:1000, ], y_train[0:1000, ]
+        x_test, y_test = x_test[0:1000, ], y_test[0:1000, ]
 
     num_classes = len(set(y_train))
 

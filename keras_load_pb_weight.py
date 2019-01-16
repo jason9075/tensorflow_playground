@@ -98,7 +98,8 @@ def main():
         # tf.train.write_graph(sess.graph, "output_models/", "tf_fashion.pbtxt", as_text=True)
 
         # frozen graph
-        frozen_graph = utils.freeze_session(sess)
+        additional_nodes = ['input', 'output_dense/BiasAdd']  # 指定輸入輸出，要不然轉出來的pb在tensorboard上有問題
+        frozen_graph = utils.freeze_session(sess, output_names=additional_nodes)
         # tf.train.write_graph(frozen_graph, "output_models/", "tf_frozen_fashion.pb", as_text=False)
         # tf.train.write_graph(frozen_graph, "output_models/", "tf_frozen_fashion.pbtxt", as_text=True)
 
