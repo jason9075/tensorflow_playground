@@ -7,8 +7,8 @@ import timeit
 from utils.mnist_reader import load_mnist
 
 LESS_DATA = True
-BATCH = 1000
 GEN_LITE_MODEL = False
+BATCH = 1000
 EVAL_LITE_MODEL = "output_models/tf_frozen_fashion.tflite"
 
 
@@ -105,6 +105,16 @@ def main():
         print("single cost time: {:.3f} sec, ans:{}, predict:{}".format(end - start, y_test[i], prediction))
 
 
+def gen_model(path, input_node, output_node):
+    converter = tf.lite.TFLiteConverter.from_frozen_graph(path, [input_node], [output_node])
+    tflite_model = converter.convert()
+
+    converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_LATENCY]
+    with open("output_models/gen_model.tflite", "wb") as f:
+        f.write(tflite_model)
+
+
 if __name__ == '__main__':
     # 若要GEN_LITE_MODEL 請用command 執行 使用pycharm run 會失敗
     main()
+    # gen_model("output_models/person_vector.pb", 'Placeholder', 'head/emb/BiasAdd')
