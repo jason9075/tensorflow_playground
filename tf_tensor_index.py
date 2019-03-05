@@ -7,7 +7,7 @@ def main():
         b = tf.constant(2, name="b")
         c = tf.add(a, b, name="c")
         split = tf.split([0, 1, 2, 3, 4], 5, name="split_op")  # return list of tensor
-        sum = tf.add(split[3], c, name="sum")
+        sum_value = tf.add(split[3], c, name="sum")
 
     tf.summary.FileWriter("tensor_board/", graph=graph)
 
@@ -19,12 +19,12 @@ def main():
 
     sess = tf.Session(graph=graph)
 
-    print('by name_0: {}, by parameter:{}'.format(sess.run(tensor_0), sess.run(split[0])))
-    print('by name_1: {}, by parameter:{}'.format(sess.run(tensor_1), sess.run(split[1])))
-    print('by name_2: {}, by parameter:{}'.format(sess.run(tensor_2), sess.run(split[2])))
-    print('by name_3: {}, by parameter:{}'.format(sess.run(tensor_3), sess.run(split[3])))
-    print('by name_4: {}, by parameter:{}'.format(sess.run(tensor_4), sess.run(split[4])))
-    print('sum: {}'.format(sess.run(sum)))
+    print('by tensor_0: {}, by parameter:{}'.format(sess.run(tensor_0), sess.run(split[0])))
+    print('by tensor_1: {}, by parameter:{}'.format(sess.run(tensor_1), sess.run(split[1])))
+    print('by tensor_2: {}, by parameter:{}'.format(sess.run(tensor_2), sess.run(split[2])))
+    print('by tensor_3: {}, by parameter:{}'.format(sess.run(tensor_3), sess.run(split[3])))
+    print('by tensor_4: {}, by parameter:{}'.format(sess.run(tensor_4), sess.run(split[4])))
+    print('sum: {}'.format(sess.run(sum_value)))
 
     sess.close()
 
