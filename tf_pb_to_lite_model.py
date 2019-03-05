@@ -110,9 +110,20 @@ def gen_model(path, input_node, output_node, output_model_name='gen_model.tflite
     # converter = tf.lite.TFLiteConverter.from_frozen_graph(path, [input_node], [output_node])
     converter = tf.lite.TFLiteConverter.from_frozen_graph(path, [input_node], [output_node],
                                                           input_shapes={input_node: [1, 300, 300, 3]})
+    converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_LATENCY]
     tflite_model = converter.convert()
 
+    with open("output_models/{}".format(output_model_name), "wb") as f:
+        f.write(tflite_model)
+
+
+def gen_model_from_h5(path, output_model_name='gen_model_h5.tflite'):
+    converter = tf.lite.TFLiteConverter.from_keras_model_file(path, input_arrays=['input_1'],
+                                                              input_shapes={'input_1': [1, 448, 448, 3]})
+    # converter.post_training_quantize = True
     converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_LATENCY]
+    tflite_model = converter.convert()
+
     with open("output_models/{}".format(output_model_name), "wb") as f:
         f.write(tflite_model)
 
@@ -126,9 +137,9 @@ def gen_model_by_input_shape(path, input_node, output_node, shape, output_model_
             tf.import_graph_def(graph_def)
 
     converter = tf.lite.TFLiteConverter.from_frozen_graph(path, [input_node], [output_node])
+    converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_LATENCY]
     tflite_model = converter.convert()
 
-    converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_LATENCY]
     with open("output_models/{}".format(output_model_name), "wb") as f:
         f.write(tflite_model)
 
@@ -175,12 +186,48 @@ def model_test(pb_model_path, input_node, output_node, lite_model_path):
         print("single cost time: {:.3f} sec, ans:{}, predict:{}".format(end - start, y_test[i], prediction))
 
 
+def h5_model_test(h5_path, lite_path):
+    from keras.models import load_model
+
+    model = load_model(h5_path)
+
+    for i in range(1, 4):
+        img = cv2.imread('data/kangaroo/k{}.jpg'.format(i))
+        img = cv2.resize(img, (448, 448), interpolation=cv2.INTER_CUBIC)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        start = timeit.default_timer()
+        model.predict(np.expand_dims(img, axis=0))
+        end = timeit.default_timer()
+        print("h5 single cost time: {:.3f} sec".format(end - start))
+
+    interpreter = tf.lite.Interpreter(model_path=lite_path)
+    interpreter.allocate_tensors()
+    input_index = interpreter.get_input_details()[0]["index"]
+    output_index = interpreter.get_output_details()[0]["index"]
+
+    for i in range(1, 4):
+        img = cv2.imread('data/kangaroo/k{}.jpg'.format(i))
+        img = cv2.resize(img, (448, 448), interpolation=cv2.INTER_CUBIC)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = (img/255).astype(np.float32)
+        start = timeit.default_timer()
+        interpreter.set_tensor(input_index, np.expand_dims(img, axis=0))
+        interpreter.invoke()
+        interpreter.get_tensor(output_index)
+        end = timeit.default_timer()
+        print("lite single cost time: {:.3f} sec".format(end - start))
+
+
 if __name__ == '__main__':
     # 若要GEN_LITE_MODEL 請用command 執行 使用pycharm run 會失敗, 或者參考以下網址 tflite_convert
     # https://www.tensorflow.org/lite/convert/cmdline_examples
     # main()
     # gen_model("output_models/person_vector.pb", 'Placeholder', 'head/emb/BiasAdd')
-    gen_model("output_models/astra_person_detector.pb", 'Preprocessor/mul', 'Postprocessor/BatchMultiClassNonMaxSuppression/map/strided_slice',
-              'astra_person_detector.tflite')
+    # gen_model("output_models/astra_person_detector.pb", 'Preprocessor/mul', 'Postprocessor/BatchMultiClassNonMaxSuppression/map/strided_slice',
+    #           'astra_person_detector.tflite')
+    gen_model_from_h5('output_models/kangaroo.h5', output_model_name='kangaroo.tflite')
     # model_test("output_models/ssd_mobilenet_v1_coco.pb", 'import/image_tensor', 'import/detection_boxes',
     #            'output_models/ssd_mobilenet_v1_coco.tflite')
+
+    h5_model_test('output_models/kangaroo.h5', 'output_models/kangaroo.tflite')
+
