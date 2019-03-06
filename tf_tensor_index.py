@@ -3,19 +3,27 @@ import tensorflow as tf
 
 def main():
     with tf.Graph().as_default() as graph:
+        # split example
         a = tf.constant(1, name="a")
         b = tf.constant(2, name="b")
         c = tf.add(a, b, name="c")
         split = tf.split([0, 1, 2, 3, 4], 5, name="split_op")  # return list of tensor
         sum_value = tf.add(split[3], c, name="sum")
 
+        # stack example
         x = tf.constant([1, 4])
         y = tf.constant([2, 5])
         z = tf.constant([3, 6])
         tf.stack([x, y, z], axis=0, name="stack_axis0")  # [[1, 4], [2, 5], [3, 6]] (Pack along first dim.)
         tf.stack([x, y, z], axis=1, name="stack_axis1")  # [[1, 2, 3], [4, 5, 6]]
 
-    # tf.summary.FileWriter("tensor_board/", graph=graph)
+        # random_uniform example
+        rand_constant = tf.constant([10.0, 20.0, 40.0], name='rand_constant')
+        rand_uniform = tf.random_uniform([3], name='rand_uniform')
+        rand_v = tf.Variable(rand_uniform, name='rand_v')
+        tf.add_n([rand_constant, rand_v], name='rand_output')
+
+    tf.summary.FileWriter("tensor_board/", graph=graph)
 
     tensor_0 = graph.get_tensor_by_name('split_op:0')
     tensor_1 = graph.get_tensor_by_name('split_op:1')
