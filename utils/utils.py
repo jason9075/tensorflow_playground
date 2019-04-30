@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.python.tools import freeze_graph
+
 
 def freeze_session(session, keep_var_names=None, output_names=None, clear_devices=True):
     graph = session.graph
