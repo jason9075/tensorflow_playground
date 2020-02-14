@@ -42,6 +42,7 @@ def main():
         -0.02304427, 0.03029038, -0.02955271, 0.11292487, 0.01218744
     ], dtype=np.float32)
 
+    keras.backend.set_learning_phase(0)
     model = keras.models.load_model(MODEL_PATH)
 
     inputs = Input(shape=(128, 1))
